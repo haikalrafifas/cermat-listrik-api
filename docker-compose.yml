@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  forecasting-api:
+    container_name: cermatlistrik.api.forecasting
+    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_APP_ID}.forecasting:prod
+    # build:
+    #   context: ./
+    #   dockerfile: ./docker/forecasting/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=cache
+      # - POSTGRES_HOST=database
+    depends_on:
+      - cache
+      # - database
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    restart: always
+
+  anomaly-worker:
+    container_name: cermatlistrik.worker.anomaly
+    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_APP_ID}.anomaly-detection:prod
+    # build:
+    #   context: ./
+    #   dockerfile: ./docker/anomaly-detection/Dockerfile
+    environment:
+      - REDIS_HOST=cache
+      - MQTT_BROKER=broker.emqx.io
+    depends_on:
+      - cache
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    restart: always
+
+  # persist-worker:
+  #   container_name: cermatlistrik.worker.persist
+  #   build:
+  #     context: ./app
+  #     dockerfile: docker/persist-worker/Dockerfile
+  #   depends_on:
+  #     - cache
+  #     - database
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 128M
+  #       reservations:
+  #         memory: 64M
+  #   restart: always
+
+  cache:
+    image: redis:6.2.6-alpine
+    container_name: cermatlistrik.cache
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+        reservations:
+          memory: 50M
+    restart: always
+
+  # database:
+  #   image: postgres:alpine
+  #   container_name: cermatlistrik.database
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: cermatlistrik
+  #     POSTGRES_PASSWORD: cermatlistrik
+  #     POSTGRES_DB: cermatlistrik_api
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256M
+  #       reservations:
+  #         memory: 128M
+
+  # webserver:
+  #   image: nginx:alpine
+  #   restart: always
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx/conf.d:/etc/nginx/conf.d:ro
+  #   depends_on:
+  #     - forecasting-api
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 32M
+  #       reservations:
+  #         memory: 16M
+
+# volumes:
+#   db-data:
+#     name: cermatlistrik.database
+
+networks:
+  default:
+    name: cermatlistrik.network

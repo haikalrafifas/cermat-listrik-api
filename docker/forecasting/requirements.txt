@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+gunicorn
+tensorflow-cpu
+joblib
+pandas
+numpy
+scikit-learn
+redis

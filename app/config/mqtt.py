@@ -1,0 +1,5 @@
+MQTT_BROKER = "broker.emqx.io"
+MQTT_BASE_TOPIC = "cermatlistrik"
+DEVICE_ID = "anonymous-smartlamp-001"
+POWER_TELEMETRY_SUBTOPIC = "telemetry/power-consumption"
+ANOMALY_SUBTOPIC = "anomalies"

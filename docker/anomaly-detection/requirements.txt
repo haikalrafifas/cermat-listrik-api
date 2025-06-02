@@ -1,0 +1,7 @@
+tensorflow-cpu
+joblib
+pandas
+numpy
+scikit-learn
+paho-mqtt
+redis
