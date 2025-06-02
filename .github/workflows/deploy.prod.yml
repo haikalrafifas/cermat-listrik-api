@@ -73,5 +73,5 @@ jobs:
           sed -i 's/^PRODUCTION_//g' .env
 
           # Re-run container (clean)
-          docker-compose -p ${{ secrets.DOCKERHUB_APP_ID }}-prod up -d --force-recreate --pull always
+          docker compose -p ${{ secrets.DOCKERHUB_APP_ID }}-prod up -d --force-recreate --pull always
           docker system prune -af
