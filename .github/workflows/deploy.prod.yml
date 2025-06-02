@@ -29,7 +29,6 @@ jobs:
         file: ./docker/anomaly-detection/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP_ID }}.anomaly-detection:prod
-        no-cache: true
 
     - name: Build and push forecasting image
       uses: docker/build-push-action@v5
@@ -38,7 +37,6 @@ jobs:
         file: ./docker/forecasting/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_APP_ID }}.forecasting:prod
-        no-cache: true
 
     - name: Create .env file from secrets
       uses: 0ndt/envfile@v2
