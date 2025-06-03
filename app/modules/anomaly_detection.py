@@ -28,6 +28,7 @@ def extract_window_features(window_df):
 Predict anomalies using machine learning model
 """
 def detect_anomalies(device_id, raw_data):
+    # print("anomaly detection function", flush=True)
     model, scaler, threshold = get_anomaly_detection_model(device_id)
 
     # Ensure raw_data isn't empty
@@ -35,18 +36,23 @@ def detect_anomalies(device_id, raw_data):
         raise ValueError("Raw data is empty. Cannot perform anomaly detection.")
 
     df_window = pd.DataFrame(raw_data)
-    df_window['timestamp'] = pd.to_datetime(df_window['timestamp'])
+    df_window['timestamp'] = pd.to_datetime(df_window['timestamp'], unit='s')
     df_window = df_window.sort_values('timestamp').reset_index(drop=True)
 
     features = extract_window_features(df_window)
     X_input = pd.DataFrame([features])
     X_scaled = scaler.transform(X_input)
+
+    # print("calling anomaly detection model...", flush=True)
     
     X_pred = model.predict(X_scaled)
+    # print("call done, reconstructing...", flush=True)
     recon_error = np.mean((X_scaled - X_pred) ** 2, axis=1)[0]
+    # print("reconstruction done, determining is it anomaly?", flush=True)
     is_anomaly = int(recon_error > threshold)
 
     if is_anomaly:
+        # print("there are anomalies", flush=True)
         # Find the most anomalous feature
         anomaly_feature_idx = np.argmax(np.abs(X_scaled - X_pred), axis=1)[0]
 
@@ -57,10 +63,9 @@ def detect_anomalies(device_id, raw_data):
         feature_names = X_input.columns.tolist()
         most_anomalous_feature = feature_names[anomaly_feature_idx]
 
-        most_anomalous_feature_timestamp = df_window['timestamp'].iloc[anomaly_feature_idx].strftime(TIMESTAMP_FORMAT_READABLE)
-
-        timestamp_start = df_window["timestamp"].iloc[0].strftime(TIMESTAMP_FORMAT_READABLE)
-        timestamp_end = df_window["timestamp"].iloc[-1].strftime(TIMESTAMP_FORMAT_READABLE)
+        timestamp_start = df_window["timestamp"].iloc[0].isoformat()
+        timestamp_end = df_window["timestamp"].iloc[-1].isoformat()
+        most_anomalous_feature_timestamp = df_window['timestamp'].iloc[anomaly_feature_idx].isoformat()
         
         return {
             "timestamp_start": timestamp_start,
@@ -69,6 +74,9 @@ def detect_anomalies(device_id, raw_data):
             "most_anomalous_feature": most_anomalous_feature,
             "message": f"Anomaly in '{most_anomalous_feature}' at {most_anomalous_feature_timestamp}"
         }
+    
+    # else:
+    #     print("NO ANOMALIES", flush=True)
 
 """
 Generate anomaly message based on type

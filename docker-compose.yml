@@ -15,12 +15,12 @@ services:
     depends_on:
       - cache
       # - database
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-        reservations:
-          memory: 128M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 256M
+    #     reservations:
+    #       memory: 128M
     restart: always
 
   anomaly-worker:
@@ -34,12 +34,12 @@ services:
       - MQTT_BROKER=broker.emqx.io
     depends_on:
       - cache
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 128M
+    #     reservations:
+    #       memory: 64M
     restart: always
 
   # persist-worker:
@@ -63,12 +63,12 @@ services:
     container_name: cermatlistrik.cache
     ports:
       - "6379:6379"
-    deploy:
-      resources:
-        limits:
-          memory: 100M
-        reservations:
-          memory: 50M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 100M
+    #     reservations:
+    #       memory: 50M
     restart: always
 
   # database:

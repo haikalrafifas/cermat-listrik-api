@@ -10,7 +10,7 @@ def generate_forecast(device_id, history_data, horizon):
     history = pd.DataFrame(history_data)
 
     # Time features
-    history['timestamp'] = pd.to_datetime(history['timestamp'])
+    history['timestamp'] = pd.to_datetime(history['timestamp'], unit='s')
     history['minute'] = history['timestamp'].dt.minute
     history['hour'] = history['timestamp'].dt.hour
     history['minute_sin'] = np.sin(2 * np.pi * history['minute'] / 60)

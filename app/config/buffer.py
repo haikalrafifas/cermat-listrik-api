@@ -1,6 +1,6 @@
 import os
 
 # Queue buffer size
-BUFFER_SIZE = 20
+MAX_BUFFER_SIZE = 3600 # data
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
