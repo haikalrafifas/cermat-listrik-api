@@ -25,46 +25,34 @@ def on_message(client, userdata, msg):
         data = json.loads(msg.payload.decode())
         buffer_count = add_to_buffer(DEVICE_ID, data)
 
-        # print("checking if eligible for anomaly detection", flush=True)
         if buffer_count >= WINDOW_SIZE:
             if last_processed_index is None:
-                # print("first time detection", flush=True)
                 # First time: start from the end of buffer minus WINDOW_SIZE (or 0 if smaller)
                 start_idx = max(0, buffer_count - WINDOW_SIZE)
                 # Fetch last WINDOW_SIZE entries (if get_buffer_slice supports it)
                 buffer = get_buffer_slice(DEVICE_ID, start_idx, WINDOW_SIZE)
 
-                # print("detecting anomalies...", flush=True)
                 result = detect_anomalies(DEVICE_ID, buffer)
                 if result:
-                    # print("there are anomalies", flush=True)
                     send_anomalies_to_clients(client, result)
-                else:
-                    # print("no anomalies", flush=True)
                 
                 # Set last_processed_index to the index of last processed entry
                 last_processed_index = start_idx + WINDOW_SIZE - STEP_SIZE  # leave STEP_SIZE for next detection
-                # print(f"last_processed_index set to {last_processed_index}", flush=True)
             else:
-                # print("running detection", flush=True)
-                # Calculate next slice start = last_processed_index + STEP_SIZE
                 next_start = last_processed_index + STEP_SIZE
 
                 # Fetch STEP_SIZE entries from buffer starting at next_start
                 buffer = get_buffer_slice(DEVICE_ID, next_start, STEP_SIZE)
                 if len(buffer) < STEP_SIZE:
-                    # print("Not enough new data for detection", flush=True)
                     return
 
                 # Run detection only on this STEP_SIZE chunk
                 result = detect_anomalies(DEVICE_ID, buffer)
                 if result:
-                    # print("anomalies detected", flush=True)
                     send_anomalies_to_clients(client, result)
 
                 # Update last_processed_index
                 last_processed_index = next_start
-                # print(f"last_processed_index updated to {last_processed_index}", flush=True)
 
     except Exception as e:
         traceback.print_exc()

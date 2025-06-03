@@ -37,3 +37,29 @@ def get_forecasted_power(
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
+
+@app.get("/telemetry/power-consumption/{device_id}/latest")
+def get_latest_power_consumption_by_device_id(
+    device_id: str,
+):
+    try:
+        latest_data = get_latest_buffer(device_id, seconds_prior=600)  # ~10 minutes if 1s frequency
+
+        if not latest_data:
+            raise HTTPException(status_code=404, detail="No recent power telemetry found.")
+
+        formatted = [
+            {
+                # "timestamp": datetime.fromtimestamp(item["timestamp"], tz=timezone.utc).isoformat(),
+                "timestamp": datetime.fromtimestamp(item["timestamp"], tz=timezone.utc).replace(tzinfo=None).isoformat(),
+                "power": float(item.get("power", 0.0))
+            }
+            for item in latest_data
+            if "timestamp" in item and "power" in item
+        ]
+
+        return { "latest_power": formatted }
+
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve telemetry: {str(e)}")
