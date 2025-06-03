@@ -3,10 +3,10 @@ version: '3.8'
 services:
   forecasting-api:
     container_name: cermatlistrik.api.forecasting
-    # image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_APP_ID}.forecasting:prod
-    build:
-      context: ./
-      dockerfile: ./docker/forecasting/Dockerfile
+    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_APP_ID}.forecasting:prod
+    # build:
+    #   context: ./
+    #   dockerfile: ./docker/forecasting/Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -25,10 +25,10 @@ services:
 
   anomaly-worker:
     container_name: cermatlistrik.worker.anomaly
-    # image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_APP_ID}.anomaly-detection:prod
-    build:
-      context: ./
-      dockerfile: ./docker/anomaly-detection/Dockerfile
+    image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_APP_ID}.anomaly-detection:prod
+    # build:
+    #   context: ./
+    #   dockerfile: ./docker/anomaly-detection/Dockerfile
     environment:
       - REDIS_HOST=cache
       - MQTT_BROKER=broker.emqx.io
